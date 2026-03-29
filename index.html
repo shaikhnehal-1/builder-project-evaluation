@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuilderPro | Project Evaluation Suite</title>
+    <style>
+        :root {
+            --navy-900: #0a192f;
+            --navy-800: #112240;
+            --navy-700: #1d2d50;
+            --accent: #64ffda;
+            --accent-hover: #4cd3b5;
+            --text-main: #e6f1ff;
+            --text-dim: #8892b0;
+            --white: #ffffff;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--navy-900);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        header h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 30px;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--accent);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        input, select {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 14px 18px;
+            color: var(--white);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(100, 255, 218, 0.1);
+        }
+
+        .number-words {
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-top: 6px;
+            font-style: italic;
+            min-height: 1.2em;
+            opacity: 0.8;
+        }
+
+        .unit-converter {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+            background: var(--navy-800);
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .conv-item {
+            text-align: center;
+        }
+
+        .conv-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+        }
+
+        .conv-value {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--white);
+        }
+
+        .suggestion-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .badge-info { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+
+        .config-list {
+            margin-top: 20px;
+        }
+
+        .config-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1.2rem;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .remove-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .btn {
+            cursor: pointer;
+            border: none;
+            border-radius: 12px;
+            padding: 14px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--navy-900);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: scale(1.02);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-outline:hover {
+            background: rgba(100, 255, 218, 0.1);
+        }
+
+        .results-panel {
+            position: sticky;
+            top: 40px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--navy-800);
+            padding: 20px;
+            border-radius: 18px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--white);
+        }
+
+        .chart-container {
+            margin-top: 30px;
+        }
+
+        .bar-chart {
+            height: 40px;
+            background: var(--navy-700);
+            border-radius: 100px;
+            overflow: hidden;
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .bar-segment {
+            height: 100%;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+        .insights {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(100, 255, 218, 0.05);
+            border-radius: 18px;
+            border: 1px dashed var(--accent);
+        }
+
+        .insight-item {
+            margin-bottom: 12px;
+            display: flex;
+            gap: 10px;
+            font-size: 0.95rem;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .footer-actions {
+            margin-top: 40px;
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            :root {
+                --card-padding: 16px;
+            }
+            .container { padding: 12px 10px; }
+            header { margin-bottom: 25px; }
+            header h1 { font-size: 1.6rem; letter-spacing: -0.5px; }
+            header p { font-size: 0.85rem; opacity: 0.8; }
+            
+            .card { 
+                padding: var(--card-padding); 
+                border-radius: 14px;
+                margin-bottom: 16px;
+            }
+            .section-title { 
+                font-size: 1rem; 
+                margin-bottom: 15px; 
+                gap: 6px;
+            }
+            
+            label { font-size: 0.75rem; margin-bottom: 3px; }
+            input, select { 
+                padding: 8px 12px; 
+                font-size: 0.85rem; 
+                border-radius: 8px;
+            }
+            .input-group { margin-bottom: 12px; }
+            
+            .unit-converter { 
+                grid-template-columns: repeat(3, 1fr); 
+                padding: 8px;
+                gap: 4px;
+                border-radius: 10px;
+            }
+            .conv-label { font-size: 0.55rem; letter-spacing: 0.5px; }
+            .conv-value { font-size: 0.7rem; }
+            
+            .stat-grid { 
+                grid-template-columns: 1fr 1fr;
+                gap: 10px; 
+                margin-bottom: 15px; 
+            }
+            .stat-card { 
+                padding: 10px; 
+                border-radius: 12px; 
+                border-left-width: 3px;
+            }
+            .stat-label { font-size: 0.6rem; }
+            .stat-value { font-size: 1rem; }
+            
+            .bar-chart { height: 24px; margin-bottom: 8px; }
+            .legend { gap: 8px; font-size: 0.7rem; }
+            .dot { width: 8px; height: 8px; }
+            
+            .insights { padding: 15px; border-radius: 14px; margin-top: 20px; }
+            .insight-item { font-size: 0.8rem; margin-bottom: 6px; gap: 6px; }
+            .btn { padding: 10px 16px; font-size: 0.85rem; border-radius: 8px; }
+            
+            .config-item { padding: 12px; border-radius: 10px; margin-bottom: 10px; }
+            .remove-btn { width: 22px; height: 22px; font-size: 0.9rem; top: 5px; right: 5px; }
+            
+            .number-words { font-size: 0.65rem; margin-top: 4px; }
+            .footer-actions { margin-top: 25px; }
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>BuilderPro Eval</h1>
+            <p>Professional-Grade Real Estate Intelligence</p>
+        </header>
+
+        <div class="grid">
+            <!-- INPUT SIDE -->
+            <div class="input-side">
+                <!-- SECTION 1: LAND & FSI -->
+                <div class="card">
+                    <div class="section-title">
+                        <span>📍</span> Land & FSI Details
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="input-group">
+                            <label>Plot Size</label>
+                            <input type="number" id="plotSize" placeholder="Enter value" value="10">
+                        </div>
+                        <div class="input-group">
+                            <label>Unit</label>
+                            <select id="plotUnit">
+                                <option value="guntha">Guntha</option>
+                                <option value="sqm">Sq. Meters</option>
+                                <option value="sqft">Sq. Feet</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="unit-converter">
+                        <div class="conv-item">
+                            <div class="conv-label">Guntha</div>
+                            <div class="conv-value" id="valGuntha">10.00</div>
+                        </div>
+                        <div class="conv-item">
+                            <div class="conv-label">Sq. Ft</div>
+                            <div class="conv-value" id="valSqft">10,890</div>
+                        </div>
+                        <div class="conv-item">
+                            <div class="conv-label">Sq. M</div>
+                            <div class="conv-value" id="valSqm">1,012</div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
+                        <div class="input-group">
+                            <label>Base FSI</label>
+                            <input type="number" id="baseFsi" step="0.1" value="2.5">
+                        </div>
+                        <div class="input-group">
+                            <label>Premium FSI</label>
+                            <input type="number" id="premiumFsi" step="0.1" value="2.0">
+                        </div>
+                    </div>
+
+                    <div id="buildingSuggest" class="suggestion-badge badge-info">
+                        Recommended: Tower Model
+                    </div>
+                </div>
+
+                <!-- SECTION 3: CONSTRUCTION & COST -->
+                <div class="card">
+                    <div class="section-title">
+                        <span>🏗️</span> Project Costs
+                    </div>
+                    <div class="input-group">
+                        <label>Land Cost (₹)</label>
+                        <input type="number" id="landCost" value="50000000">
+                        <div class="number-words" id="landCostWords">Five Crore Rupees</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="input-group">
+                            <label>Construction (₹/sqft)</label>
+                            <input type="number" id="constCostPerSqft" value="2500">
+                        </div>
+                        <div class="input-group">
+                            <label>Extra Costs (₹)</label>
+                            <input type="number" id="extraCosts" value="5000000">
+                        </div>
+                    </div>
+                    <div class="number-words" id="extraCostsWords">Fifty Lakh Rupees</div>
+                </div>
+
+                <!-- SECTION 4: UNIT CONFIGURATION -->
+                <div class="card">
+                    <div class="section-title">
+                        <span>🏢</span> Unit Configuration
+                        <button class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem; margin-left: auto; width: auto;" onclick="suggestBestMix()">Suggest Best Mix</button>
+                    </div>
+                    
+                    <div id="configList" class="config-list">
+                        <!-- Dynamic items here -->
+                    </div>
+
+                    <button class="btn btn-outline" onclick="addConfig()">+ Add Configuration</button>
+                    
+                    <div style="margin-top: 15px; font-size: 0.85rem; color: var(--text-dim);">
+                        💡 1000 sqft BUA ≈ 600 sqft Carpet
+                    </div>
+                </div>
+
+                <!-- SECTION 5: PRICING & REVENUE -->
+                <div class="card">
+                    <div class="section-title">
+                        <span>💰</span> Pricing & Revenue
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="input-group">
+                            <label>Selling Price (₹/sqft)</label>
+                            <input type="number" id="sellPrice" value="6500">
+                            <div class="number-words" id="sellPriceWords">Six Thousand Five Hundred Rupees</div>
+                        </div>
+                        <div class="input-group">
+                            <label>Dev. Charges (₹/sqft)</label>
+                            <input type="number" id="devCharges" value="500">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="input-group">
+                            <label>No. of Parkings</label>
+                            <input type="number" id="parkingCount" value="40">
+                        </div>
+                        <div class="input-group">
+                            <label>Price per Parking (₹)</label>
+                            <input type="number" id="parkingPrice" value="300000">
+                            <div class="number-words" id="parkingPriceWords">Three Lakh Rupees</div>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="input-group">
+                            <label>Floor Rise (₹/floor)</label>
+                            <input type="number" id="floorRise" value="50">
+                        </div>
+                        <div class="input-group">
+                            <label>Avg Tax % on Profit</label>
+                            <input type="number" id="taxPercent" value="25">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESULTS SIDE -->
+            <div class="results-side">
+                <div class="results-panel">
+                    <div class="card">
+                        <div class="section-title">
+                            <span>📊</span> Project Feasibility Report
+                        </div>
+
+                        <div class="stat-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Saleable Area</div>
+                                <div class="stat-value" id="resSaleableArea">0</div>
+                                <div style="font-size: 0.7rem; color: var(--text-dim);">SQ. FT</div>
+                            </div>
+                            <div class="stat-card" style="border-color: var(--success);">
+                                <div class="stat-label">Net Profit</div>
+                                <div class="stat-value" id="resNetProfit">₹0</div>
+                                <div style="font-size: 0.7rem; color: var(--text-dim);">AFTER TAX</div>
+                            </div>
+                            <div class="stat-card" style="border-color: var(--warning);">
+                                <div class="stat-label">Total Revenue</div>
+                                <div class="stat-value" id="resTotalRevenue">₹0</div>
+                            </div>
+                            <div class="stat-card" style="border-color: var(--danger);">
+                                <div class="stat-label">Total Cost</div>
+                                <div class="stat-value" id="resTotalCost">₹0</div>
+                            </div>
+                        </div>
+
+                        <div class="chart-container">
+                            <label>Profit vs Cost Analysis</label>
+                            <div class="bar-chart">
+                                <div id="barCost" class="bar-segment" style="background: var(--danger); width: 60%;"></div>
+                                <div id="barProfit" class="bar-segment" style="background: var(--success); width: 40%;"></div>
+                            </div>
+                            <div class="legend">
+                                <div class="legend-item"><span class="dot" style="background: var(--danger);"></span> Cost</div>
+                                <div class="legend-item"><span class="dot" style="background: var(--success);"></span> Profit</div>
+                            </div>
+                        </div>
+
+                        <div class="chart-container">
+                            <label>Revenue Breakdown</label>
+                            <div class="bar-chart">
+                                <div id="revFlat" class="bar-segment" style="background: #3b82f6; width: 70%;"></div>
+                                <div id="revParking" class="bar-segment" style="background: #8b5cf6; width: 15%;"></div>
+                                <div id="revCharges" class="bar-segment" style="background: #ec4899; width: 15%;"></div>
+                            </div>
+                            <div class="legend">
+                                <div class="legend-item"><span class="dot" style="background: #3b82f6;"></span> Flats</div>
+                                <div class="legend-item"><span class="dot" style="background: #8b5cf6;"></span> Parking</div>
+                                <div class="legend-item"><span class="dot" style="background: #ec4899;"></span> Charges</div>
+                            </div>
+                        </div>
+
+                        <div class="insights" id="insightBox">
+                            <!-- Dynamic insights -->
+                        </div>
+
+                        <div class="footer-actions">
+                            <button class="btn btn-primary" onclick="downloadReport()">📥 Download Project Report</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Constants
+        const GUNTHA_TO_SQFT = 1089;
+        const SQM_TO_SQFT = 10.7639;
+
+        // State
+        let configs = [
+            { id: 1, type: '2BHK', area: 1000, count: 20 },
+            { id: 2, type: '1BHK', area: 650, count: 15 }
+        ];
+
+        // Number to Words (Indian System)
+        function numberToWords(num) {
+            if (num === 0) return 'Zero';
+            const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
+            const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+            const inWords = (n) => {
+                if (n < 20) return a[n];
+                if (n < 100) return b[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + a[n % 10] : '');
+                if (n < 1000) return inWords(Math.floor(n / 100)) + ' Hundred' + (n % 100 !== 0 ? ' and ' + inWords(n % 100) : '');
+                return '';
+            };
+
+            let str = '';
+            let n = Math.floor(num);
+
+            if (n >= 10000000) {
+                str += inWords(Math.floor(n / 10000000)) + ' Crore ';
+                n %= 10000000;
+            }
+            if (n >= 100000) {
+                str += inWords(Math.floor(n / 100000)) + ' Lakh ';
+                n %= 100000;
+            }
+            if (n >= 1000) {
+                str += inWords(Math.floor(n / 1000)) + ' Thousand ';
+                n %= 1000;
+            }
+            str += inWords(n);
+            return str.trim() + ' Rupees';
+        }
+
+        function formatCurrency(num) {
+            if (num >= 10000000) return '₹' + (num / 10000000).toFixed(2) + ' Cr';
+            if (num >= 100000) return '₹' + (num / 100000).toFixed(2) + ' L';
+            return '₹' + Math.round(num).toLocaleString('en-IN');
+        }
+
+        // UI Updates
+        function updateUI() {
+            const plotSize = parseFloat(document.getElementById('plotSize').value) || 0;
+            const plotUnit = document.getElementById('plotUnit').value;
+            const baseFsi = parseFloat(document.getElementById('baseFsi').value) || 0;
+            const premiumFsi = parseFloat(document.getElementById('premiumFsi').value) || 0;
+            
+            // Area Conversion
+            let sqft = 0;
+            if (plotUnit === 'guntha') sqft = plotSize * GUNTHA_TO_SQFT;
+            else if (plotUnit === 'sqm') sqft = plotSize * SQM_TO_SQFT;
+            else sqft = plotSize;
+
+            const guntha = sqft / GUNTHA_TO_SQFT;
+            const sqm = sqft / SQM_TO_SQFT;
+
+            document.getElementById('valGuntha').innerText = guntha.toFixed(2);
+            document.getElementById('valSqft').innerText = Math.round(sqft).toLocaleString();
+            document.getElementById('valSqm').innerText = Math.round(sqm).toLocaleString();
+
+            // Building Suggestion
+            const suggestBadge = document.getElementById('buildingSuggest');
+            if (guntha <= 6) {
+                suggestBadge.innerText = 'Recommended: G+7 Building';
+                suggestBadge.className = 'suggestion-badge badge-success';
+            } else {
+                suggestBadge.innerText = 'Recommended: Tower Model';
+                suggestBadge.className = 'suggestion-badge badge-info';
+            }
+
+            // Words
+            document.getElementById('landCostWords').innerText = numberToWords(parseFloat(document.getElementById('landCost').value) || 0);
+            document.getElementById('extraCostsWords').innerText = numberToWords(parseFloat(document.getElementById('extraCosts').value) || 0);
+            document.getElementById('sellPriceWords').innerText = numberToWords(parseFloat(document.getElementById('sellPrice').value) || 0);
+            document.getElementById('parkingPriceWords').innerText = numberToWords(parseFloat(document.getElementById('parkingPrice').value) || 0);
+
+            calculateResults(sqft, baseFsi, premiumFsi);
+        }
+
+        function calculateResults(plotSqft, baseFsi, premiumFsi) {
+            const totalFsi = baseFsi + premiumFsi;
+            const grossArea = plotSqft * totalFsi;
+            const saleableArea = grossArea * 0.95;
+
+            // Costs
+            const landCost = parseFloat(document.getElementById('landCost').value) || 0;
+            const constCostPerSqft = parseFloat(document.getElementById('constCostPerSqft').value) || 0;
+            const extraCosts = parseFloat(document.getElementById('extraCosts').value) || 0;
+            const totalConstCost = saleableArea * constCostPerSqft;
+            const totalProjectCost = landCost + totalConstCost + extraCosts;
+
+            // Revenue
+            const sellPrice = parseFloat(document.getElementById('sellPrice').value) || 0;
+            const devCharges = parseFloat(document.getElementById('devCharges').value) || 0;
+            const parkingCount = parseFloat(document.getElementById('parkingCount').value) || 0;
+            const parkingPrice = parseFloat(document.getElementById('parkingPrice').value) || 0;
+            const floorRise = parseFloat(document.getElementById('floorRise').value) || 0;
+            
+            // Unit Config Revenue
+            let configAreaUsed = 0;
+            let configRevenue = 0;
+            configs.forEach(c => {
+                configAreaUsed += c.area * c.count;
+                configRevenue += (c.area * c.count) * sellPrice;
+            });
+
+            const remainingArea = Math.max(0, saleableArea - configAreaUsed);
+            const flatRevenue = configRevenue + (remainingArea * sellPrice);
+            
+            const chargesRevenue = saleableArea * devCharges;
+            const parkingRevenue = parkingCount * parkingPrice;
+            
+            const isTower = (plotSqft / GUNTHA_TO_SQFT) > 6;
+            const floorRiseRevenue = isTower ? (saleableArea * 0.5 * floorRise * 5) : 0;
+
+            const totalRevenue = flatRevenue + chargesRevenue + parkingRevenue + floorRiseRevenue;
+
+            // Profit
+            const grossProfit = totalRevenue - totalProjectCost;
+            const taxPercent = parseFloat(document.getElementById('taxPercent').value) || 0;
+            const netProfit = grossProfit * (1 - (taxPercent / 100));
+            const profitMargin = (grossProfit / totalRevenue) * 100;
+
+            // Update Results UI
+            document.getElementById('resSaleableArea').innerText = Math.round(saleableArea).toLocaleString();
+            document.getElementById('resTotalRevenue').innerText = formatCurrency(totalRevenue);
+            document.getElementById('resTotalCost').innerText = formatCurrency(totalProjectCost);
+            document.getElementById('resNetProfit').innerText = formatCurrency(netProfit);
+
+            // Charts
+            const profitWidth = Math.max(5, (grossProfit / totalRevenue) * 100);
+            const costWidth = 100 - profitWidth;
+            document.getElementById('barProfit').style.width = profitWidth + '%';
+            document.getElementById('barCost').style.width = costWidth + '%';
+
+            const flatPct = (flatRevenue / totalRevenue) * 100;
+            const parkPct = (parkingRevenue / totalRevenue) * 100;
+            const charPct = ((chargesRevenue + floorRiseRevenue) / totalRevenue) * 100;
+
+            document.getElementById('revFlat').style.width = flatPct + '%';
+            document.getElementById('revParking').style.width = parkPct + '%';
+            document.getElementById('revCharges').style.width = charPct + '%';
+
+            generateInsights(profitMargin, sellPrice, constCostPerSqft, isTower);
+        }
+
+        function generateInsights(margin, sell, constCost, isTower) {
+            const box = document.getElementById('insightBox');
+            let html = '<div class="section-title" style="font-size: 1rem;">🧠 Strategic Insights</div>';
+            
+            if (margin > 30) html += '<div class="insight-item"><span>🔥</span> High Profit Potential Project</div>';
+            else if (margin < 15) html += '<div class="insight-item"><span>⚠️</span> Low margin risk. Review costs.</div>';
+
+            if (constCost > (sell * 0.5)) html += '<div class="insight-item"><span>⚠️</span> Construction cost too high vs selling price</div>';
+            
+            if (isTower) html += '<div class="insight-item"><span>🚀</span> Tower model yields higher ROI via floor rise</div>';
+            else html += '<div class="insight-item"><span>💡</span> G+7 is optimal for this plot size</div>';
+
+            html += '<div class="insight-item"><span>💡</span> Target 2BHK mix (1000 sqft) for velocity</div>';
+
+            box.innerHTML = html;
+        }
+
+        // Config Management
+        function renderConfigs() {
+            const list = document.getElementById('configList');
+            list.innerHTML = '';
+            configs.forEach((c) => {
+                const div = document.createElement('div');
+                div.className = 'config-item';
+                div.innerHTML = `
+                    <button class="remove-btn" onclick="removeConfig(${c.id})">×</button>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                        <div>
+                            <label>Type</label>
+                            <select onchange="updateConfig(${c.id}, 'type', this.value)">
+                                <option value="1BHK" ${c.type === '1BHK' ? 'selected' : ''}>1BHK</option>
+                                <option value="2BHK" ${c.type === '2BHK' ? 'selected' : ''}>2BHK</option>
+                                <option value="3BHK" ${c.type === '3BHK' ? 'selected' : ''}>3BHK</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Area (sqft)</label>
+                            <input type="number" value="${c.area}" oninput="updateConfig(${c.id}, 'area', this.value)">
+                        </div>
+                        <div>
+                            <label>Units</label>
+                            <input type="number" value="${c.count}" oninput="updateConfig(${c.id}, 'count', this.value)">
+                        </div>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function addConfig() {
+            configs.push({ id: Date.now(), type: '2BHK', area: 1000, count: 10 });
+            renderConfigs();
+            updateUI();
+        }
+
+        function removeConfig(id) {
+            configs = configs.filter(c => c.id !== id);
+            renderConfigs();
+            updateUI();
+        }
+
+        function updateConfig(id, key, val) {
+            const config = configs.find(c => c.id === id);
+            if (config) {
+                config[key] = key === 'type' ? val : parseFloat(val) || 0;
+                updateUI();
+            }
+        }
+
+        function suggestBestMix() {
+            const plotSize = parseFloat(document.getElementById('plotSize').value) || 0;
+            const plotUnit = document.getElementById('plotUnit').value;
+            const baseFsi = parseFloat(document.getElementById('baseFsi').value) || 0;
+            const premiumFsi = parseFloat(document.getElementById('premiumFsi').value) || 0;
+            
+            let sqft = 0;
+            if (plotUnit === 'guntha') sqft = plotSize * GUNTHA_TO_SQFT;
+            else if (plotUnit === 'sqm') sqft = plotSize * SQM_TO_SQFT;
+            else sqft = plotSize;
+
+            const saleable = sqft * (baseFsi + premiumFsi) * 0.95;
+            
+            configs = [
+                { id: 1, type: '2BHK', area: 1000, count: Math.floor((saleable * 0.5) / 1000) },
+                { id: 2, type: '1BHK', area: 650, count: Math.floor((saleable * 0.3) / 650) },
+                { id: 3, type: '3BHK', area: 1500, count: Math.floor((saleable * 0.2) / 1500) }
+            ];
+            renderConfigs();
+            updateUI();
+        }
+
+        function downloadReport() {
+            const content = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Project Evaluation Report</title>
+                    <style>
+                        body { font-family: sans-serif; padding: 40px; color: #333; max-width: 800px; margin: 0 auto; }
+                        h1 { color: #0a192f; border-bottom: 2px solid #64ffda; padding-bottom: 10px; }
+                        .stat-box { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 30px 0; }
+                        .stat-item { background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 5px solid #64ffda; }
+                        .label { font-size: 0.8rem; color: #666; text-transform: uppercase; }
+                        .value { font-size: 1.5rem; font-weight: bold; }
+                        .table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        .table th, .table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+                        .table th { background: #0a192f; color: white; }
+                    </style>
+                </head>
+                <body>
+                    <h1>BuilderPro Project Report</h1>
+                    <div class="stat-box">
+                        <div class="stat-item"><div class="label">Saleable Area</div><div class="value">${document.getElementById('resSaleableArea').innerText} sqft</div></div>
+                        <div class="stat-item"><div class="label">Net Profit</div><div class="value">${document.getElementById('resNetProfit').innerText}</div></div>
+                        <div class="stat-item"><div class="label">Total Revenue</div><div class="value">${document.getElementById('resTotalRevenue').innerText}</div></div>
+                        <div class="stat-item"><div class="label">Total Cost</div><div class="value">${document.getElementById('resTotalCost').innerText}</div></div>
+                    </div>
+                    
+                    <h3>Unit Configuration Mix</h3>
+                    <table class="table">
+                        <thead><tr><th>Type</th><th>Area (sqft)</th><th>Units</th><th>Total Area</th></tr></thead>
+                        <tbody>
+                            ${configs.map(c => `<tr><td>${c.type}</td><td>${c.area}</td><td>${c.count}</td><td>${c.area * c.count}</td></tr>`).join('')}
+                        </tbody>
+                    </table>
+
+                    <div style="margin-top: 40px; font-size: 0.9rem; color: #888;">
+                        Report generated on ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}
+                    </div>
+                </body>
+                </html>
+            `;
+            const blob = new Blob([content], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'BuilderPro_Report.html';
+            a.click();
+        }
+
+        // Init
+        document.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('input', updateUI);
+        });
+
+        renderConfigs();
+        updateUI();
+    </script>
+</body>
+</html>
